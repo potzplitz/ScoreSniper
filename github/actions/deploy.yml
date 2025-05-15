@@ -1,0 +1,23 @@
+name: Deploy Scoresniper via SCP
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  deploy:
+    runs-on: docker
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install scp and sshpass
+        run: |
+          apt-get update
+          apt-get install -y openssh-client sshpass          
+
+      - name: Upload project files via SCP
+        run: |
+          sshpass -p "${{ secrets.SFTP_PASS }}" scp -o StrictHostKeyChecking=no -r $(pwd) ${{ secrets.SFTP_USER }}@ssh.potzplitz.de:/var/www/html/scoresniper_dev     
